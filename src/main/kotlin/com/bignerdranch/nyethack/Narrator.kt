@@ -1,3 +1,5 @@
+package com.bignerdranch.nyethack
+
 import kotlin.random.Random
 
 // Using Lambdas
@@ -81,7 +83,7 @@ fun narrate(
     var narrationModifier: (String) -> String = { it }
 fun narrate(
     message: String,
-    modifier: (String) -> String = { narrationModifier(it)}
+    modifier: (String) -> String = { narrationModifier(it) }
 ) {
     println(modifier(message))
 }

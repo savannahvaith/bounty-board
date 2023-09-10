@@ -1,3 +1,5 @@
+package com.bignerdranch.nyethack
+
 import java.io.File
 import kotlin.random.Random
 import kotlin.random.nextInt
@@ -20,7 +22,7 @@ private val menuItemPrices = menuData.associate { (_, name, price) ->
     name to price.toDouble()
 }
 
-private val menuItemTypes = menuData.associate {(type, name, _)  ->
+private val menuItemTypes = menuData.associate { (type, name, _)  ->
     name to type
 }
 
@@ -323,7 +325,7 @@ fun visitTavern(){
      */
 
     // Scope Functions
-
+/*
     narrate("$heroName enters $TAVERN_NAME")
     narrate("Thee are several items for sale:")
     narrate(menuItems.joinToString())
@@ -386,6 +388,72 @@ fun visitTavern(){
     narrate("There are still some patrons in the tavern")
     narrate(patrons.joinToString())
 
+ */
+
+    // Classes
+
+    narrate("${player.name} enters $TAVERN_NAME")
+    narrate("Thee are several items for sale:")
+    narrate(menuItems.joinToString())
+
+    val patrons: MutableSet<String> = firstNames.shuffled()
+        .zip(lastNames.shuffled()) { firstName, lastName -> "$firstName $lastName"
+        }.toMutableSet()
+
+    val greeting = patrons.firstOrNull()?.let {
+        "$it walks over to Madrigal and say's, " +
+                "\"Hi I'm $it. Welcome to Kronstadt!\""
+    } ?: "Nobody greets Madrigal because the tavern is empty"
+
+    /*
+    Another way to write the above - is to use if/else -- alternative to L334 - L337
+
+    val friendlyPatron = patrons.firstOrNull()
+    val greeting = if(friendlyPatron != null) {
+        "$friendlyPatron walks over to Madrigal and says blahblahblah"
+    } else{
+        "Nobody greets cause it's empty"
+    }
+    */
+
+    val tavernPlaylist = mutableListOf("Folk","RnB","Jazz")
+    val nowPlaying:String = tavernPlaylist.run {
+        shuffle() // shuffles the playlist
+        "${first()} is currently playing in the tavern"
+    }
+
+    println(greeting + nowPlaying)
+    val patronGold = mutableMapOf(
+        TAVERN_MASTER to 86.00,
+        player.name to 4.50,
+//        * is the spread operator
+        *patrons.map { it to 6.00}.toTypedArray()
+    )
+    patrons.forEach {patronName ->
+        patronGold += patronName to 6.0
+    }
+
+    narrate("${player.name} sees several patrons in the tavern:")
+    narrate(patrons.joinToString())
+
+    val itemOfDay = patrons.flatMap { getFavouriteMenuItems(it) }.random()
+    narrate("The item of the day is: $itemOfDay")
+
+    repeat(3) {
+        placeOrder(patrons.random(), menuItems.random(), patronGold)
+    }
+    displayPatronBalances(patronGold)
+
+    patrons.filter { patron -> patronGold.getOrDefault(patron,0.0) < 4.0 }
+        .also { departingPatrons ->
+            patrons -= departingPatrons
+            patronGold -= departingPatrons
+        }.forEach { patron ->
+            narrate("${player.name} sees $patron departing the tavern")
+        }
+    narrate("There are still some patrons in the tavern")
+    narrate(patrons.joinToString())
+
 }
 
 /*
@@ -410,7 +478,7 @@ private fun placeOrder(
             "meal" -> "serves"
             else -> "hands"
         }
-        narrate("${TAVERN_MASTER} $action $patronName a $menuItemName")
+        narrate("$TAVERN_MASTER $action $patronName a $menuItemName")
         narrate("$patronName pays $TAVERN_MASTER $itemPrice gold")
         patronGold[patronName] = patronGold.getValue(patronName) - itemPrice
         patronGold[TAVERN_MASTER] = patronGold.getValue(TAVERN_MASTER) + itemPrice
@@ -420,7 +488,7 @@ private fun placeOrder(
 }
 
 private fun displayPatronBalances(patronGold: MutableMap<String, Double>){
-    narrate("$heroName intuitively knows how much money each patron has")
+    narrate("${player.name} intuitively knows how much money each patron has")
     patronGold.forEach{ (patron, balance) ->
         narrate("$patron has ${"%.2f".format(balance)} gold")
     }
