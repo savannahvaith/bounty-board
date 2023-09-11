@@ -1,4 +1,7 @@
 package com.bignerdranch.nyethack
+
+import numVowels
+
 class Player(
     initialName: String,
     val homeTown: String = "NeverSummer",
@@ -15,7 +18,7 @@ class Player(
         get() = when {
             name.all { it.isDigit() } -> "The Identifiable"
             name.none { it.isLetter() } -> "The Witness Protection Member"
-            name.count {it.lowercase() in "aeiou"} > 4 -> "The Master of Vowels"
+            name.numVowels > 4 -> "The Master of Vowels"
             else -> "The renowned Hero"
         }
 
